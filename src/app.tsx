@@ -21,7 +21,7 @@ import {connect} from 'react-redux';
 import { createStore } from 'redux'
 import appReducer from './redux/reducers';
 //Redux actions
-import { JustDoSomething } from './redux/actions';
+import { CatchPokemon } from './redux/actions';
 
 //Don't forget, that thanks to the provider, you can connect your props to your components
 

@@ -1,16 +1,16 @@
 import ActionTypes from './actionTypes';
 
-export function JustDoSomething()
+export function CatchPokemon()
 {
     //Add app logic here if needed
     return{
-        type: ActionTypes.DoSomething
+        type: ActionTypes.CatchPokemon
     }
 }
 
 export function MakeItExpensive()
 {
     return{
-        type: ActionTypes.MakeItExpensive
+        type: ActionTypes.ReleasePokemon
     }
 }
