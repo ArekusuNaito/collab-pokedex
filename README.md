@@ -1,36 +1,17 @@
-# A seed to start quickly
+# Collaborative Pokedex App
 
+`Progress: MVP Client with 1 User is working. It is now time to work on the collaborative part.`
 
-![](https://trello-attachments.s3.amazonaws.com/54d96ae8cd8a263bf8dd70e9/58a0583c279a6110be1355d0/a7b637438dda91ad590e31be419c6063/Made_with_Love.gif)
+This app allows you to track progress on a Pokedex __with friends__. This app is useful is many people want to help each other in getting a living dex as well. __Everyone will have the same pokedex completion progress.__
 
-**Clone and run for minimum config.**
+Here's the first wireframe mockup.
 
-This is a minimal boilerplate for the following technologies `react`, `redux`, `react-redux` and `electron`, these are bundled thanks to [fuse-box](http://fuse-box.org/).
-
-
-Inside the `src` folder you will find.
-- An `electron` folder that has the main.js file
-- A `redux` folder, with a very basic example of actions and reducers.
-- The `app.tsx` file, this one imports what I would consider the minumum components from the dependencies and that will help you understand and start with all these technologies combined.
+![mockup](readme-assets/1st-mockup.png)
 
 
 
-## To Use
+`The current repository has a React-Redux MVP completely functional and it looks like this.`
 
-```bash
-# Clone this repository
-git clone https://github.com/ArekusuNaito/react-electron-redux-fusebox-boilerplate.git
-# Go into the repository
-cd <your project name>
-# Install dependencies
-npm install
-# Start the fuse server
-node fuse
-# Run Electron. Uses the main attribute of the package.json
-electron .
-```
+![mvp](readme-assets/functional-mvp.png)
 
-
-
-## Special Thanks
-- [The fuse-box guys](https://github.com/fuse-box)
+For now, data is saved on the browser. The next part is to work on the collaborative part, where users can see the synced version of the same pokedex they joined. It is time to do server work.

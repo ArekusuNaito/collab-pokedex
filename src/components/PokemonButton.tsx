@@ -40,7 +40,7 @@ export default class PokemonButton extends React.Component<PokemonButtonProps,Po
     {
         return <div>
             <h1>{this.state.caught.toString()}</h1>
-            <Button onClick={this.internalClick}>{this.props.dexNumber}</Button>
+            <Button variant="contained" color="primary" onClick={this.internalClick}>{this.props.dexNumber}</Button>
         </div>
     }
 }
