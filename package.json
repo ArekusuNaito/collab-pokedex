@@ -1,7 +1,7 @@
 {
-  "name": "react-electron-fusebox-react-and-redux",
+  "name": "Collab-Pokedex",
   "version": "1.0.0",
-  "description": "Just a seed for many technologies.",
+  "description": "A collaborative pokedex checklist for caught pokemon",
   "main": "src/electron/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,13 +21,15 @@
     "babel-plugin-direct-import": "^0.5.0",
     "electron": "^8.0.1",
     "fuse-box": "^4.0.0-next.165",
-    "typescript": "^3.0.3",
+    "tslib": "^1.11.0",
+    "typescript": "^3.8.2",
     "uglify-es": "^3.3.9",
     "uglify-js": "^3.4.9"
   },
   "dependencies": {
+    "@material-ui/core": "^4.9.4",
     "prop-types": "^15.6.2",
-    "react": "^16.4.2",
+    "react": "^16.8.3",
     "react-dom": "^16.4.2",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",

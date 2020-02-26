@@ -1,7 +1,6 @@
 const actions =
 {
-    CatchPokemon: "CatchPokemon",
-    ReleasePokemon: "ReleasePokemon"
+    UpdateCaughtPokemon: "UpdateCaughtPokemon",
 }
 
 export default actions;

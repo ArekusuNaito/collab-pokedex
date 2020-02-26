@@ -1,16 +1,13 @@
 import ActionTypes from './actionTypes';
+import PokemonData from '../models/PokemonData'
 
-export function CatchPokemon()
+//Asyncs processes work here
+
+export function UpdateCaughtPokemon(pokemonData:PokemonData)
 {
     //Add app logic here if needed
     return{
-        type: ActionTypes.CatchPokemon
-    }
-}
-
-export function MakeItExpensive()
-{
-    return{
-        type: ActionTypes.ReleasePokemon
+        pokemonData,
+        type: ActionTypes.UpdateCaughtPokemon
     }
 }

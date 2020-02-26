@@ -4,7 +4,10 @@
     "target": "ESNext",
     "jsx": "react",
     "importHelpers": true,
+    "inlineSources": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "resolveJsonModule": true, //to import json files withing js/ts files
+    "esModuleInterop": true //neeeded as well to import json files
   }
 }

@@ -1,55 +1,29 @@
-
-//When using electron you can use fs in your code.
-//But you have to add the 
-//target: "electron@esnext", electron target in the fuse file.
-//If not, use browser.
-let fs = require('fs');
-console.log(fs);
-//
 import * as React from "react";
 import {render}  from 'react-dom'
 import {HashRouter,Route,Switch} from 'react-router-dom';
 //React redux
+import initialState from './initialState.json'
 import {Provider} from 'react-redux';
 import {connect} from 'react-redux';
-
-
-
-
-
+//UI
+import PokedexScreenMVP from './screens/pokedex-mvp'
 //Redux
 import { createStore } from 'redux'
-import appReducer from './redux/reducers';
-//Redux actions
-import { CatchPokemon } from './redux/actions';
+import appCombinedReducers from './redux/reducers';
+//Storage
+import {loadState,saveState} from './services/persistence-service';
+
 
 //Don't forget, that thanks to the provider, you can connect your props to your components
 
 function mapStateToProps(state)
 {
-    console.log('Mapping  state to props!',state);
+    // console.log('Mapping  state to props!',state);
+    //Executes everytime states updates
     return{
-        isThisAwesome: state.isEverythingCool   
+        storeState:state,
+        pokemonPerRow:3
     }
-}
-
-
-//Actual code starts here
-let initialState =
-{
-    isEverythingCool: false,
-    isExpensive: false   
-}
-
-function JustAComponent(props)
-{
-    //You can see the HashRouter history is here.
-    //You can access the history,location,match
-    console.log(props); //
-    
-    return(
-        <h1>Well, apparently this works!!</h1>
-    )
 }
 
 function Error404()
@@ -58,12 +32,22 @@ function Error404()
         <h1>404: THERE ARE NOT SECRETS HERE!</h1>
     )
 }
+let mappedAndConnectedScreen = connect(mapStateToProps)(PokedexScreenMVP);
 
-let mappedAndConnectedComponent = connect(mapStateToProps)(JustAComponent);
+const store = createStore(appCombinedReducers,loadState())
+// const store = createStore(appCombinedReducers,initialState)
+//Subscribe listeners
+// store.subscribe(()=>console.info('New Store State:',store.getState()))
 
+console.log('Initial State', store.getState(),initialState);
+store.subscribe(() => console.info('New Store State:', store.getState()))
 
-const store = createStore(appReducer,initialState)
-
+//Saving data: Still unsure if this is the best place to do it.
+store.subscribe(()=>
+{
+    console.info('Saving State to localStorage');
+    saveState(store.getState());
+})
 
 
 //Using the hash router because of electron
@@ -71,7 +55,7 @@ render(
     <Provider store={store}>
         <HashRouter>
             <Switch>
-                <Route exact path='/' component={mappedAndConnectedComponent} />
+                <Route exact path='/' component={mappedAndConnectedScreen} />
                 <Route path='*' component={Error404}/>
             </Switch>
         </HashRouter>
