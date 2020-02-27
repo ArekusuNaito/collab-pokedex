@@ -1,0 +1,15 @@
+{
+	"users": [
+		"me",
+		"you"
+	],
+	"pokemon": {
+		"completion": {
+			"1": true,
+			"4": true,
+			"6": true,
+			"8": true
+		},
+		"caught": 4
+	}
+}
