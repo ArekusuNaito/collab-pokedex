@@ -1,25 +1,38 @@
-// const homeDirectoryName = "src";
-// const outputDirectoryName = "dist"
-
 const {fusebox} = require('fuse-box');
 const {pluginJSON} = require('fuse-box');
 const fuse = fusebox
 ({
     entry: 'server.ts',
     target: 'server',
-    // homeDir: homeDirectoryName,
-    // useSingleBundle: true,
     // tsConfig: 'src/tsconfig.json', //If you already have a tsconfig, you can tell fusebox where it is
-    dependencies:{include:['tslib']}, //👈 Sometimes fuse-box is weird and it will work without this line of code. Might save your day if you add it
     // hmr: true,
     // watch:true,
+    watcher: {
+      include: 
+      [
+        "server.ts"
+      ],
+      ignore: 
+      [
+        "database/"
+      ]
+    },
     plugins: [pluginJSON()]
 });
-fuse.runDev(handler=>
-  {
-    handler.onComplete(output=>
-      {
-        //This will execute your entry file and it will be refreshed
-        output.server.handleEntry({nodeArgs:[],scriptArgs:[]})
-      })
-  })
+
+// https: //github.com/fuse-box/fuse-box/blob/grand-refactor/docs/changelog-fuse-compiler.md
+
+async function startBundling()
+{
+  const {onComplete} = await fuse.runDev();
+  onComplete(({server}) => server.start());
+}
+
+startBundling();
+
+//Promise bundling
+// const devServer = fuse.runDev();
+// devServer.then(runResponse=>
+// {
+//   runResponse.onComplete(handler=>handler.server.start({argsAfter:['after'],argsBefore:['before']}))
+// })

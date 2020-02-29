@@ -35,23 +35,22 @@ const pokemon = (state:PokemonModel={},action)=>
       let newState = {...state};
       if(pokemonData.caught==false)
       {
+        console.log('before',newState);
+        
         //For some reason, delete is not working....? 🤷‍♂️
-        // const didDelete = delete newState[pokemonData.dexNumber];
-        newState.completion[pokemonData.dexNumber]=false;
-      }
-      else newState.completion[pokemonData.dexNumber]=true
-      //Count how many pokemon you caught
-      let dexNumbers = Object.keys(newState.completion)
-      let caught = 0;
-      for(let dexNumber in newState.completion)
-      {
-        let pokemonData:boolean = newState.completion[dexNumber];
-        if(pokemonData)caught++
+        delete newState.completion[pokemonData.dexNumber];
+        // newState.completion[pokemonData.dexNumber]=false;
+        console.log('after',newState)
         
       }
-      newState.caught=caught;
-
-      return {...state,...newState}
+      else newState.completion[pokemonData.dexNumber]=true
+      //Get the key count, that's how many pokemon we have
+      newState.caught=Object.keys(newState.completion).length;
+      return {...newState}
+    }
+    case Actions.OverridePokemonState:
+    {
+      return {...action.pokemon}
     }
     default: return state
   }

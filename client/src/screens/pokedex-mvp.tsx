@@ -1,28 +1,34 @@
 import * as React from "react";
-import { Provider } from 'react-redux';
 import { connect } from 'react-redux';
 
 import Grid from '@material-ui/core/Grid';
 import PokemonButton from '../components/PokemonButton';
-import { UpdateCaughtPokemon } from '../redux/actions'
+import { UpdateCaughtPokemon,OverridePokemonState } from '../redux/actions'
 //actions
 //models
 import PokemonData from '../models/PokemonData'
 
+// import io from 'socket.io-client';
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:8888'
+
+
 interface State
 {
-    pokemonList:number[]
+    pokemonList:number[],
 }
 
 interface Props
 {
     //Important to add an interface to the store state in another file
-    storeState:{pokemon:{completion:{},caught:number}}
+    storeState?:{pokemon:{completion:{},caught:number}}
     pokemonPerRow:number,
-    dispatch: Function
+    dispatch?: Function,
+    socket: SocketIOClient.Socket;
 }
 
-export default class PokedexScreenMVP extends React.Component<Props,State>
+
+class PokedexScreenMVP extends React.Component<Props,State>
 {
     constructor(props)
     {
@@ -33,13 +39,19 @@ export default class PokedexScreenMVP extends React.Component<Props,State>
         {
             "pokemonList":[]
         }
+        // const socket = io('http://localhost:8888');
+        console.log(this.props);
+        
         
     }
     
 
-    getKantoPokemonData()
+    async getKantoPokemonData()
     {
-        // console.log("Getting Pokemon data...");
+        const response = await axios.get(`/pokedex/kanto-la`);
+        const serverState = response.data;
+        console.log('axios pokedex',serverState);
+        this.props.dispatch(OverridePokemonState(serverState.pokemon))
         let pokedexData:number[] = []
         for (let dexNumber = 1; dexNumber <= 151; dexNumber++) 
         {
@@ -49,9 +61,20 @@ export default class PokedexScreenMVP extends React.Component<Props,State>
         
     }
 
-    componentDidMount()
+    async componentDidMount()
     {
-        this.getKantoPokemonData();
+        await this.getKantoPokemonData();
+        //Socket listeners
+        this.props.socket.on('pokemonUpdated',(pokemonData:PokemonData)=>
+        {
+            console.log(`Que crees que updatearon un Pokemondongo`, pokemonData);
+            this.props.dispatch(UpdateCaughtPokemon(pokemonData))
+            
+        });
+        this.props.socket.on('updateError',errorData=>
+        {
+            console.error(errorData);
+        })
     }
 
     getRowSize():number
@@ -64,28 +87,30 @@ export default class PokedexScreenMVP extends React.Component<Props,State>
 
         return this.state.pokemonList.map(dexNumber=>
         {
-            const caughtState = (this.props.storeState.pokemon.completion.hasOwnProperty(dexNumber))?this.props.storeState.pokemon.completion[dexNumber]:false;
+            const caughtState = (this.props.storeState.pokemon.completion.hasOwnProperty(dexNumber)) ? this.props.storeState.pokemon.completion[dexNumber]:false;
 
             return (
                 <Grid item key={"grid" + dexNumber} xs={this.getRowSize()}>
-                    <PokemonButton caught={caughtState} onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} />
+                    {/* <PokemonButton caught={caughtState} onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} /> */}
+                    <PokemonButton onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} />
             </Grid>)
 
         });
     }
 
-    updatePokemonData(pokemonData:PokemonData)
+    async updatePokemonData(pokemonData:PokemonData)
     {
         console.log('Button State',pokemonData.caught,pokemonData.dexNumber);
-        this.props.dispatch(UpdateCaughtPokemon(pokemonData))
+        this.props.socket.emit('updatePokemon',pokemonData);        
     }
+
 
 
     render()
     {
         return( 
         <div>
-            <h1>Caught:{this.props.storeState.pokemon.caught}/151</h1>
+                <h1>Caught:{this.props.storeState.pokemon.caught}/151</h1>
             <Grid
                 container
                 direction="row"
@@ -98,3 +123,13 @@ export default class PokedexScreenMVP extends React.Component<Props,State>
         
     }
 }
+
+function mapStateToProps(state, ownProps) 
+{
+    return {
+        storeState: state,
+        socket: ownProps.socket
+    }
+}
+
+export default connect(mapStateToProps)(PokedexScreenMVP);

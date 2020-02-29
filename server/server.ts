@@ -5,19 +5,68 @@
 
 import fs from 'fs';
 import bodyParser, { json } from "body-parser";
+import socket from "socket.io";
 import cors from 'cors';
-import express from 'express'
+import express, { request, response } from 'express'
+import { emit } from 'cluster';
 const app = express();
 const port = 8888;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-app.listen(port,()=>
+const expressServer = app.listen(port,()=>
 {
     console.log(`Server has started on port: ${port}`);
+});
+
+const databasePath = `./database`;
+
+const io = socket(expressServer)
+io.on('connection',socket=>
+{
+    console.log('User connected',socket.client.id,socket.rooms);
+    socket.on('updatePokemon',async (pokemonData:PokemonData)=>
+    {
+        pokemonData.pokedexID='kanto-la';
+        console.log(`Received: ${pokemonData.dexNumber}:${pokemonData.caught}`);
+        //Is it neccesary to update the database here?
+        //How would it be better? Maybe on a disconnect or something?
+        //It works but it's a thought to know if this is a right way to do it
+        const isFileOK = await handleUpdatePokemon(pokemonData);
+        if (isFileOK) io.emit('pokemonUpdated',pokemonData);
+        else io.emit('updateError',{errorMessage:`Error Updating the server database`,pokemonData})
+        
+    });
+    socket.on('disconnect',()=>
+    {
+        console.log(`${socket.client.id} disconnected`);
+        
+    });
+});
+
+
+async function handleGetPokedex(pokedexID:string):Promise<any>
+{
+    return new Promise((resolve, reject) => 
+    {
+        const pokedexPath:string = `${databasePath}/${pokedexID}.json`
+        fs.readFile(pokedexPath,`utf-8`,(error,fileContents)=>
+        {
+            resolve(fileContents);
+        })
+    })
+}
+
+app.get(`/pokedex/:id`, async (request, response)=>
+{
+    console.log(`/pokedex/`,request.params);
+    const pokedexData = await handleGetPokedex(request.params.id);
+    response.status(200).send(JSON.parse(pokedexData));
     
 });
+
+
 
 app.get('/ping',(request,response)=>
 {
@@ -27,9 +76,10 @@ app.get('/ping',(request,response)=>
 });
 
 //Update json file
+//Not being used for now as this has been moved to the socket
 app.put('/update/pokemon',async (request,response)=>
 {
-    const pokemonData:PokemonRequestBody = request.body;
+    const pokemonData:PokemonData = request.body;
     const isFileOK:boolean = await handleUpdatePokemon(pokemonData);
     if(isFileOK)
     {
@@ -41,7 +91,7 @@ app.put('/update/pokemon',async (request,response)=>
     }
 })
 
-async function handleUpdatePokemon(pokemonData:PokemonRequestBody):Promise<any>
+async function handleUpdatePokemon(pokemonData:PokemonData):Promise<any>
 {
     //Given the pokemonData, it must update the specific pokedex-file
     console.log(pokemonData.pokedexID);
@@ -53,21 +103,22 @@ async function handleUpdatePokemon(pokemonData:PokemonRequestBody):Promise<any>
         {
             fs.readFile(pokedexPath, encoding, (error, fileContents) => 
             {
-                console.log(error);
                 
                 if (error) resolve(false);
-                else {
+                else 
+                {
                     let pokedex: Pokedex = JSON.parse(fileContents);
-                    pokedex.pokemon.completion[pokemonData.dexNumber] = pokemonData.caught;
-                    //Count how many pokkemon you've caught
-                    let caught = 0;
-                    for (let dexNumber in pokedex.pokemon.completion) {
-                        const pokemon: boolean = pokedex.pokemon.completion[dexNumber];
-                        if (pokemon) caught++
+                    //We either set it to true, or we delete the key to save a bit of storage space
+                    if(pokemonData.caught)
+                    {
+                        pokedex.pokemon.completion[pokemonData.dexNumber] = true;
                     }
-                    pokedex.pokemon.caught = caught; //Finally set it
+                    else delete pokedex.pokemon.completion[pokemonData.dexNumber]; 
+                    pokedex.pokemon.caught = Object.keys(pokedex.pokemon.completion).length;
                     //Then write the contents of the file
-                    fs.writeFile(pokedexPath, JSON.stringify(pokedex, null, '\t'), () => {
+                    fs.writeFile(pokedexPath, JSON.stringify(pokedex, null, '\t'), () => 
+                    {
+                        
                         resolve(true);
                     })
 
@@ -92,7 +143,7 @@ interface Pokedex
     }
 }
 
-interface PokemonRequestBody
+interface PokemonData
 {
     pokedexID?:string,
     dexNumber: number

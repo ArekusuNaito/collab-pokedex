@@ -5,9 +5,17 @@ import PokemonData from '../models/PokemonData'
 
 export function UpdateCaughtPokemon(pokemonData:PokemonData)
 {
-    //Add app logic here if needed
+    //Add app logic here if needed    
     return{
         pokemonData,
         type: ActionTypes.UpdateCaughtPokemon
+    }
+}
+
+export function OverridePokemonState(pokemon:{})
+{
+    return{
+        pokemon,
+        type: ActionTypes.OverridePokemonState
     }
 }

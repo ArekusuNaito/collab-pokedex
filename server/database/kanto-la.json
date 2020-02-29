@@ -7,9 +7,13 @@
 		"completion": {
 			"1": true,
 			"4": true,
+			"5": true,
 			"6": true,
-			"8": true
+			"7": true,
+			"10": true,
+			"25": true,
+			"26": true
 		},
-		"caught": 4
+		"caught": 8
 	}
 }
