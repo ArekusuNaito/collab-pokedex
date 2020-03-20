@@ -3,14 +3,12 @@ import { connect } from 'react-redux';
 
 import Grid from '@material-ui/core/Grid';
 import PokemonButton from '../components/PokemonButton';
-import { UpdateCaughtPokemon,OverridePokemonState } from '../redux/actions'
-//actions
+import { UpdateCaughtPokemon,SetPokedexData } from '../redux/actions'
+import { LogoutUser } from '../redux/actions'
 //models
 import PokemonData from '../models/PokemonData'
-
-// import io from 'socket.io-client';
-import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:8888'
+import { PokedexDatabase } from '../services/DatabaseService';
+//Research use-effect, use-state in react
 
 
 interface State
@@ -21,10 +19,12 @@ interface State
 interface Props
 {
     //Important to add an interface to the store state in another file
-    storeState?:{pokemon:{completion:{},caught:number}}
+    storeState?: { user?:firebase.User, pokedex?: { id?: string, name?:string, pokemon?: { completion?: {}, caught: number }}}
     pokemonPerRow:number,
     dispatch?: Function,
-    socket: SocketIOClient.Socket;
+    database: PokedexDatabase
+    history: any,
+    auth: firebase.auth.Auth
 }
 
 
@@ -35,12 +35,12 @@ class PokedexScreenMVP extends React.Component<Props,State>
         super(props)   
         this.createPokemonButtons = this.createPokemonButtons.bind(this);
         this.updatePokemonData = this.updatePokemonData.bind(this);
+        this.testButtonClick = this.testButtonClick.bind(this)
         this.state=
         {
             "pokemonList":[]
         }
-        // const socket = io('http://localhost:8888');
-        console.log(this.props);
+        // console.log(this.props);
         
         
     }
@@ -48,10 +48,6 @@ class PokedexScreenMVP extends React.Component<Props,State>
 
     async getKantoPokemonData()
     {
-        const response = await axios.get(`/pokedex/kanto-la`);
-        const serverState = response.data;
-        console.log('axios pokedex',serverState);
-        this.props.dispatch(OverridePokemonState(serverState.pokemon))
         let pokedexData:number[] = []
         for (let dexNumber = 1; dexNumber <= 151; dexNumber++) 
         {
@@ -61,20 +57,18 @@ class PokedexScreenMVP extends React.Component<Props,State>
         
     }
 
+    async testButtonClick()
+    {        
+        this.props.dispatch(LogoutUser());
+        this.props.auth.signOut();
+        this.props.history.push('/sign');
+    }
+
     async componentDidMount()
     {
         await this.getKantoPokemonData();
-        //Socket listeners
-        this.props.socket.on('pokemonUpdated',(pokemonData:PokemonData)=>
-        {
-            console.log(`Que crees que updatearon un Pokemondongo`, pokemonData);
-            this.props.dispatch(UpdateCaughtPokemon(pokemonData))
-            
-        });
-        this.props.socket.on('updateError',errorData=>
-        {
-            console.error(errorData);
-        })
+        
+        
     }
 
     getRowSize():number
@@ -87,13 +81,12 @@ class PokedexScreenMVP extends React.Component<Props,State>
 
         return this.state.pokemonList.map(dexNumber=>
         {
-            const caughtState = (this.props.storeState.pokemon.completion.hasOwnProperty(dexNumber)) ? this.props.storeState.pokemon.completion[dexNumber]:false;
-
+            
             return (
                 <Grid item key={"grid" + dexNumber} xs={this.getRowSize()}>
                     {/* <PokemonButton caught={caughtState} onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} /> */}
                     <PokemonButton onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} />
-            </Grid>)
+                </Grid>)           
 
         });
     }
@@ -101,7 +94,24 @@ class PokedexScreenMVP extends React.Component<Props,State>
     async updatePokemonData(pokemonData:PokemonData)
     {
         console.log('Button State',pokemonData.caught,pokemonData.dexNumber);
-        this.props.socket.emit('updatePokemon',pokemonData);        
+        //TODO: Check if async functionality is not messing with flow
+        this.props.dispatch(UpdateCaughtPokemon(pokemonData))
+        await this.props.database.updateCaughtPokemonClient(this.props.storeState.pokedex.id,this.props.storeState.pokedex.pokemon,this.props.storeState.user);
+        //What happens when there's no completion here
+        // console.log(this.props.storeState.pokedex.pokemon.caught);
+        // this.props.database
+        // if (pokemonData.caught) 
+        // {
+           
+        //     await this.props.database.ref(`${this.props.storeState.pokedexID}/pokemon/completion/${pokemonData.dexNumber}`).set(true);
+
+        // }
+        // else 
+        // {
+        //     await this.props.database.ref(`${this.props.storeState.pokedexID}/pokemon/completion/${pokemonData.dexNumber}`).remove();
+        // }
+        // this.props.dispatch(UpdateCaughtPokemon(pokemonData))
+        // await this.props.database.ref(`${this.props.storeState.pokedexID}/pokemon/caught`).set(this.props.storeState.pokemon.caught);
     }
 
 
@@ -110,7 +120,8 @@ class PokedexScreenMVP extends React.Component<Props,State>
     {
         return( 
         <div>
-                <h1>Caught:{this.props.storeState.pokemon.caught}/151</h1>
+                <h1>Caught:{this.props.storeState.pokedex.pokemon.caught}/151</h1>
+                <button onClick={this.testButtonClick}>Logout</button>
             <Grid
                 container
                 direction="row"
@@ -128,7 +139,7 @@ function mapStateToProps(state, ownProps)
 {
     return {
         storeState: state,
-        socket: ownProps.socket
+        database: state.database
     }
 }
 

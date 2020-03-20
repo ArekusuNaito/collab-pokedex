@@ -56,7 +56,11 @@ class PokemonButton extends React.Component<PokemonButtonProps,PokemonButtonStat
 //Remember this function executes everytime the state changes
 function mapStateToProps(state, ownProps) 
 {
-    let caughtValue = (state.pokemon.completion.hasOwnProperty(ownProps.dexNumber))?true:false   
+    let caughtValue=false;
+    if(state.pokedex.pokemon.completion) //Check if there's an empty pokedex
+    {
+        caughtValue = (state.pokedex.pokemon.completion.hasOwnProperty(ownProps.dexNumber)) ? true : false
+    }
     return {
         caught: caughtValue,
     }

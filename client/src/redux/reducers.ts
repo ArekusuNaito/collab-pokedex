@@ -15,75 +15,110 @@ import PokemonData from "../models/PokemonData";
 // Perform side effects like API calls and routing transitions;
 // Call non - pure functions, e.g.Date.now() or Math.random().
 
-interface PokemonModel
+interface PokedexModel
 {
-  completion?:{},
-  caught?:number
+  id?:string
+  name?:string
+  pokemon?:
+  {
+    completion?: {},
+    caught?: number
+  }
+  
 }
 
-const pokemon = (state:PokemonModel={},action)=>
+const pokedex = (state:PokedexModel={},action)=>
 {
   switch(action.type)
   {
     case Actions.UpdateCaughtPokemon:
-    {
-      //Add typescript check for action.pokemonData
-      const pokemonData:PokemonData = action.pokemonData;
-      console.log('Data to update',pokemonData);
-      
-      //Clone it to manipulate it
-      let newState = {...state};
-      if(pokemonData.caught==false)
       {
-        console.log('before',newState);
-        
-        //For some reason, delete is not working....? 🤷‍♂️
-        delete newState.completion[pokemonData.dexNumber];
-        // newState.completion[pokemonData.dexNumber]=false;
-        console.log('after',newState)
-        
+        //Add typescript check for action.pokemonData
+        const pokemonData: PokemonData = action.pokemonData;
+        console.log('Data to update', pokemonData);
+
+        //Clone it to manipulate it
+        let newState = { ...state };
+        if (!newState.pokemon.completion) {
+          newState.pokemon.completion = {}
+
+        }
+        if (pokemonData.caught == false) {
+          console.log('before', newState);
+          delete newState.pokemon.completion[pokemonData.dexNumber];
+          // newState.completion[pokemonData.dexNumber]=false;
+          console.log('after', newState)
+
+        }
+        else newState.pokemon.completion[pokemonData.dexNumber] = true
+        //Get the key count, that's how many pokemon we have
+        newState.pokemon.caught = Object.keys(newState.pokemon.completion).length || 0;
+        return { ...newState }
       }
-      else newState.completion[pokemonData.dexNumber]=true
-      //Get the key count, that's how many pokemon we have
-      newState.caught=Object.keys(newState.completion).length;
-      return {...newState}
-    }
-    case Actions.OverridePokemonState:
-    {
-      return {...action.pokemon}
-    }
+    case Actions.SetPokedexData:
+      {
+        console.log('dbPokedex',action.pokedex);
+        
+        return { ...state,...action.pokedex }
+      }
+
+
+
     default: return state
   }
 }
 
 
-const users = (state = [], action) => 
+
+//TODO: Refactor the set/remove actions for specific things
+
+const user = (state={},action)=>
 {
-  return [...state]
+  switch(action.type)
+  {
+    case Actions.LoginUser:
+    {
+      return {...action.user};
+    }
+    case Actions.LogOutUser:
+    {
+      return null;
+    }
+    default: return state;
+  }
+  
 }
 
+const database = (state=null,action)=>
+{
+  switch(action.type)
+  {
+    case Actions.SetDatabase:
+    {
+        return action.database;
+    }
+    default: return state; 
+  }
+}
 
-
-// const isEverythingCool = (state={},action) =>
-// {
-//   switch(action.type)
-//   {
-//     case Actions.DoSomething:
-//     {
-//       return {...state,isEverythingCool:true};
-//     }
-//     default:
-//     {
-//       return state;
-//     }
-//   }
-// }
+const auth = (state=null,action)=>
+{
+  switch(action.type)
+  {
+    case Actions.SetAuth:
+    {
+      return action.auth 
+    }
+    default: return state;
+  }
+}
 
 
 export default combineReducers(
   {
-    users,
-    pokemon,
-    // totalPokemon
+    pokedex,
+    user,
+    auth,
+    database
   }
 )

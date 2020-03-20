@@ -1,10 +1,16 @@
 {
-    "users":["me","you"],
-    "pokemon":{
-        "completion": 
-        {
-            
-        },
-        "caught":0
-    }
+    "pokedex":
+    {
+        "id": null,
+        "name":null,
+        "pokemon": {
+            "completion": {
+
+            },
+            "caught": 0
+        }
+    },
+    "user":null,
+    "auth":null,
+    "database": null
 }

@@ -1,7 +1,15 @@
 const actions =
 {
     UpdateCaughtPokemon: "UpdateCaughtPokemon",
-    OverridePokemonState: "OverridePokemonState"
+    SetPokedexData: "OverridePokemonState",
+    LoginUser: "LoginUser",
+    LogOutUser: "LogoutUser",
+    LeavePokedex: "LeavePokedex",
+    SetAuth: "SetAuth",
+    RemoveAuth: "RemoveAuth",
+    SetDatabase: "SetDatabase",
+    RemoveDatabase: "RemoveDatabase"
+
 }
 
 export default actions;
