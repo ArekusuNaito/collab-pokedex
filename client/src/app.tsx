@@ -1,10 +1,9 @@
 import * as React from "react";
 import {render}  from 'react-dom'
-import {BrowserRouter,Route,Switch} from 'react-router-dom';
+import {BrowserRouter,Route,Switch,Redirect,Link} from 'react-router-dom';
 //React redux
 import initialState from './initialState.json'
 import {Provider} from 'react-redux';
-import {connect} from 'react-redux';
 //UI
 import PokedexScreenMVP from './screens/PokedexMVP'
 import AuthenticationScreen from './screens/AuthScreen'
@@ -13,8 +12,6 @@ import { createStore, applyMiddleware } from 'redux'
 import appCombinedReducers from './redux/reducers';
 import promiseMiddleware from 'redux-promise'
 import {SetAuthenticationObject, SetPokedexDatabaseObject} from './redux/actions'
-//Storage
-import {loadState,saveState} from './services/PersistenceService';
 //Firebase
 import * as firebase from "firebase"; //probably fuse-box requires to not have the "* as" import
 import pokedexDatabase from './services/DatabaseService';
@@ -51,14 +48,42 @@ store.subscribe(() => console.info('New Store State:', store.getState()))
 store.dispatch(SetAuthenticationObject(auth));
 store.dispatch(SetPokedexDatabaseObject(pokedexDatabase));
 
+//Create and test private routing and auto-redirect
+
+const PrivatePokedexRoute = ({...rest }) =>
+{
+    return <Route {...rest} render={(props) => 
+    {
+        //props.location: {hash,pathname,search,state}
+        //props.history: {push}
+        
+        if (auth.currentUser) 
+        {
+            console.warn('No pos, si, si esta verdad, si esta loggeado');
+            
+            return <PokedexScreenMVP {...props} pokemonPerRow={3} />
+        }
+        else 
+        {
+            console.warn('Redirecting to login...');
+            return <Redirect to='/sign' />
+        }
+    }}/>
+} 
+    
+    
+
+
 render(
     <Provider store={store}>
         <BrowserRouter>
+            <Link to="/home" />
             <Switch>
-                {/* <Route exact path='/' component={PokedexScreenMVP} /> */}
                 <Route path="/sign" render={(props) => <AuthenticationScreen {...props} />}/>
-                <Route exact path='/home' render={(props) => <PokedexScreenMVP {...props} pokemonPerRow={3} />} /> 
+                <PrivatePokedexRoute path='/home' />
+                {/* <Route exact path='/home' render={(props) => <PokedexScreenMVP {...props} pokemonPerRow={3} />} />  */}
                 <Route path='*' component={Error404}/>
+                
             </Switch>
         </BrowserRouter>
     </Provider>, document.getElementById("app"));

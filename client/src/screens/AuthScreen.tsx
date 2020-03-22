@@ -47,29 +47,25 @@ class AuthenticationScreen extends React.Component<Props>
         this.goToPokedexes = this.goToPokedexes.bind(this);
         //Section references
         this.pokedexName = React.createRef()
-                
-        // this.props.auth.onAuthStateChanged(async user => 
-        // {  
-        //     if (!user) 
-        //     {
-        //         console.log('Logout detected');
-        //         this.props.logoutUser();                
-        //     }
-        //     else 
-        //     {
-        //         console.log('user logins', user.email);
-        //         this.props.loginUser(user);
-        //         this.pokedexList = await this.props.database.getUserPokedexes(this.props.user);
-                
-        //     }
-        // })
+        console.log(props);
+        
     }
 
 
 
     async componentDidMount()
     {      
-        
+        this.props.auth.onAuthStateChanged(async user => {
+            if (user) {
+                console.log('user logins', user.email);
+                this.pokedexDictionary = await this.props.database.getUserPokedexesIDs(user);
+                this.props.loginUser(user);
+            }
+            else {
+                console.log('Logout detected');
+                this.props.logoutUser();
+            }
+        })
     }
 
     async signIn(email:string,password:string)
