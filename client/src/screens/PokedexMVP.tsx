@@ -8,11 +8,15 @@ import { LogoutUser } from '../redux/actions'
 //models
 import PokemonData from '../models/PokemonData'
 import { PokedexDatabase } from '../services/DatabaseService';
+import PokedexAppBar from '../components/PokedexAppBar';
+import HamburgerMenu from '../components/HamburgerMenu';
+
 //Research use-effect, use-state in react
 
 
 interface State
 {
+    openMenu:boolean
     pokemonList:number[],
 }
 
@@ -30,15 +34,18 @@ interface Props
 
 class PokedexScreenMVP extends React.Component<Props,State>
 {
+    
     constructor(props)
     {
         super(props)   
         this.createPokemonButtons = this.createPokemonButtons.bind(this);
         this.updatePokemonData = this.updatePokemonData.bind(this);
-        this.testButtonClick = this.testButtonClick.bind(this)
+        this.logOut = this.logOut.bind(this)
+        
         this.state=
         {
-            "pokemonList":[]
+            openMenu:false,
+            pokemonList:[]
         }
         // console.log(this.props);
         
@@ -57,7 +64,7 @@ class PokedexScreenMVP extends React.Component<Props,State>
         
     }
 
-    async testButtonClick()
+    async logOut()
     {        
         this.props.dispatch(LogoutUser());
         this.props.auth.signOut();
@@ -66,6 +73,9 @@ class PokedexScreenMVP extends React.Component<Props,State>
 
     async componentDidMount()
     {
+        console.log('PokedexMVP Did mount');
+        
+        
         await this.getKantoPokemonData();
         
         
@@ -91,6 +101,7 @@ class PokedexScreenMVP extends React.Component<Props,State>
         });
     }
 
+
     async updatePokemonData(pokemonData:PokemonData)
     {
         console.log('Button State',pokemonData.caught,pokemonData.dexNumber);
@@ -114,14 +125,38 @@ class PokedexScreenMVP extends React.Component<Props,State>
         // await this.props.database.ref(`${this.props.storeState.pokedexID}/pokemon/caught`).set(this.props.storeState.pokemon.caught);
     }
 
+    openHamburgerMenu()
+    {
+        console.warn('Opening Ham!');
+        this.setState((prevState)=>
+        {
+            return { openMenu: !prevState.openMenu };
+            
+        })
 
+        
+    }
+
+    onClose(event: React.MouseEvent)
+    {
+        this.setState((prevState) => {
+            return { openMenu: false };
+
+        })
+    }
 
     render()
     {
         return( 
-        <div>
-                <h1>Caught:{this.props.storeState.pokedex.pokemon.caught}/151</h1>
-                <button onClick={this.testButtonClick}>Logout</button>
+        <>
+            <HamburgerMenu open={this.state.openMenu}
+                onClose={this.onClose.bind(this)}
+            />
+            <PokedexAppBar title="Pokedex" canLogout={true} 
+                openHamburgerMenu={this.openHamburgerMenu.bind(this)}
+                enableHamburgerMenu={true}
+            />
+            <h1>Caught:{this.props.storeState.pokedex.pokemon.caught}/151</h1>
             <Grid
                 container
                 direction="row"
@@ -129,7 +164,7 @@ class PokedexScreenMVP extends React.Component<Props,State>
                 spacing={2}>
                 {this.createPokemonButtons()}
             </Grid>
-        </div>)
+        </>)
         
         
     }

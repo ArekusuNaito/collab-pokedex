@@ -35,7 +35,6 @@ export default class SelectPokedexContainer extends React.Component<Props>
         const items = createListItems(this.props.items)
         return (
         <>
-            <h1>hey</h1>
             <List component="nav">
                 {items}
             </List>

@@ -58,14 +58,11 @@ const PrivatePokedexRoute = ({...rest }) =>
         //props.history: {push}
         
         if (auth.currentUser) 
-        {
-            console.warn('No pos, si, si esta verdad, si esta loggeado');
-            
+        {            
             return <PokedexScreenMVP {...props} pokemonPerRow={3} />
         }
         else 
         {
-            console.warn('Redirecting to login...');
             return <Redirect to='/sign' />
         }
     }}/>
@@ -77,13 +74,11 @@ const PrivatePokedexRoute = ({...rest }) =>
 render(
     <Provider store={store}>
         <BrowserRouter>
-            <Link to="/home" />
             <Switch>
                 <Route path="/sign" render={(props) => <AuthenticationScreen {...props} />}/>
                 <PrivatePokedexRoute path='/home' />
                 {/* <Route exact path='/home' render={(props) => <PokedexScreenMVP {...props} pokemonPerRow={3} />} />  */}
                 <Route path='*' component={Error404}/>
-                
             </Switch>
         </BrowserRouter>
     </Provider>, document.getElementById("app"));

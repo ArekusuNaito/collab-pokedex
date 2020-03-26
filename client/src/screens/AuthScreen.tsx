@@ -1,11 +1,5 @@
 import * as React from "react";
 import { connect } from 'react-redux';
-//Material UI
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp'
-import Typography from '@material-ui/core/Typography';
 //Custom containers
 import AuthenticationContainer from '../components/AuthenticationContainer'
 import FirstTimePokedexContainer from '../components/FirstTimePokedexContainer';
@@ -14,6 +8,19 @@ import SelectPokedexContainer from '../components/SelectPokedexContainer';
 //Database
 import {LoginUser, LogoutUser, JoinPokedex, CreatePokedex, SetPokedexData} from '../redux/actions'
 import {PokedexDatabase} from '../services/DatabaseService';
+import PokedexAppBar from '../components/PokedexAppBar';
+//CSS
+import { createStyles, makeStyles, Theme, withStyles } from '@material-ui/core/styles';
+
+const styles=
+{
+    loginSection:
+    {
+        flexGrow: 1,
+        margin: "2% 10%"
+    },
+}
+
 
 interface Props
 {
@@ -27,7 +34,7 @@ interface Props
     user: firebase.User;
     pokedexID: string
     history: any
-    
+    classes: any
 }
 // export default class AuthenticationScreen extends React.Component<Props>
 class AuthenticationScreen extends React.Component<Props>
@@ -47,7 +54,7 @@ class AuthenticationScreen extends React.Component<Props>
         this.goToPokedexes = this.goToPokedexes.bind(this);
         //Section references
         this.pokedexName = React.createRef()
-        console.log(props);
+        console.warn(props);
         
     }
 
@@ -55,21 +62,24 @@ class AuthenticationScreen extends React.Component<Props>
 
     async componentDidMount()
     {      
-        this.props.auth.onAuthStateChanged(async user => {
-            if (user) {
-                console.log('user logins', user.email);
-                this.pokedexDictionary = await this.props.database.getUserPokedexesIDs(user);
-                this.props.loginUser(user);
-            }
-            else {
-                console.log('Logout detected');
-                this.props.logoutUser();
-            }
-        })
+        // this.props.auth.onAuthStateChanged(async user => {
+        //     if (user) 
+        //     {
+        //         this.pokedexDictionary = await this.props.database.getUserPokedexesIDs(user);
+        //         this.props.loginUser(user);
+
+        //     }
+        //     else {
+        //         console.log('Logout detected');
+        //         this.props.logoutUser();
+        //     }
+        // })
     }
 
     async signIn(email:string,password:string)
     {
+        
+        console.warn('email',email,'password',password);
         
         this.props.auth.signInWithEmailAndPassword(email,password)
         .then(async credential=>
@@ -87,7 +97,7 @@ class AuthenticationScreen extends React.Component<Props>
         
     }
 
-    async sighOut()
+    async signOut()
     {
         this.props.logoutUser();
     }
@@ -130,18 +140,21 @@ class AuthenticationScreen extends React.Component<Props>
         this.props.history.push('/home');
     }
 
+    openHamburgerMenu()
+    {
+        console.log('Hamburger menu');
+        
+    }
+
     render()
     {
         let componentToRender=<></>;
-        let toolBar=<></>
         let title:string="";
+        let canLogout=false;
         
         if(!this.props.user) 
         {
-            title="Login"   
-            toolBar = (<Toolbar>
-                <Typography variant="h5" >{title}</Typography>                
-            </Toolbar>)
+            title="Login"
             componentToRender = 
             <AuthenticationContainer
             signIn={this.signIn}
@@ -149,12 +162,7 @@ class AuthenticationScreen extends React.Component<Props>
         }
         else //But does this user has any pokedexes?
         {
-            toolBar = toolBar = (<Toolbar>
-                <Typography variant="h5" >{title}</Typography>
-                <IconButton onClick={this.sighOut.bind(this)} edge="end" color="inherit">
-                    <ExitToAppIcon />
-                </IconButton>
-            </Toolbar>)
+            canLogout=true;
             if(Object.keys(this.pokedexDictionary).length>0) //
             {
                 
@@ -167,14 +175,6 @@ class AuthenticationScreen extends React.Component<Props>
             else //You are not part of a pokedex. Let's take you to one
             {                
                 title = "First Time Settings"
-                toolBar = toolBar = (<Toolbar>
-                    <Typography variant="h5" >{title}</Typography>
-                    <IconButton onClick={this.sighOut.bind(this)} edge="end" color="inherit">
-                        <ExitToAppIcon />
-                    </IconButton>
-
-
-                </Toolbar>)
                 componentToRender = <FirstTimePokedexContainer
                     joinPokedex={this.joinPokedex}
                     createPokedex={this.createPokedex}
@@ -185,14 +185,20 @@ class AuthenticationScreen extends React.Component<Props>
         
         return(
         <>
-        <AppBar position="fixed">
-            {toolBar}
-        </AppBar>
-        {componentToRender}
+            <PokedexAppBar title={title} canLogout={canLogout} 
+                onLogOutClick={this.signOut.bind(this)}
+                // enableHamburgerMenu={true}
+                
+            />
+            <>
+                {componentToRender}
+            </>
         </>
         )
         
     }
+
+    
 
 
 }
@@ -246,4 +252,8 @@ function mergeProps(propsFromState,propsFromDispatch,ownProps)
     
 }
 
-export default connect(mapStateToProps,mapDispatchToProps,mergeProps)(AuthenticationScreen);
+const styledComponent = withStyles(styles)(AuthenticationScreen);
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(styledComponent);
+
+
+//CSS
