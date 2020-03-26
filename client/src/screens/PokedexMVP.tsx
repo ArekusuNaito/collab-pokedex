@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from 'react-redux';
 
 import Grid from '@material-ui/core/Grid';
-import PokemonButton from '../components/PokemonButton';
+import PokemonCard from '../components/PokemonCard';
 import { UpdateCaughtPokemon,SetPokedexData } from '../redux/actions'
 import { LogoutUser } from '../redux/actions'
 //models
@@ -10,6 +10,10 @@ import PokemonData from '../models/PokemonData'
 import { PokedexDatabase } from '../services/DatabaseService';
 import PokedexAppBar from '../components/PokedexAppBar';
 import HamburgerMenu from '../components/HamburgerMenu';
+// 
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 
 //Research use-effect, use-state in react
 
@@ -93,9 +97,9 @@ class PokedexScreenMVP extends React.Component<Props,State>
         {
             
             return (
-                <Grid item key={"grid" + dexNumber} xs={this.getRowSize()}>
+                <Grid className={"width: 25%"} item key={"grid" + dexNumber} xs={this.getRowSize()}>
                     {/* <PokemonButton caught={caughtState} onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} /> */}
-                    <PokemonButton onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} />
+                    <PokemonCard onClick={this.updatePokemonData} key={dexNumber} dexNumber={dexNumber} />
                 </Grid>)           
 
         });
@@ -147,21 +151,28 @@ class PokedexScreenMVP extends React.Component<Props,State>
 
     render()
     {
+        const endSection = <Typography variant="h5">
+            {`Caught:${this.props.storeState.pokedex.pokemon.caught}/151`}
+        </Typography>
+        const logoutButton = 
+            <IconButton onClick={null} edge="start" color="inherit" aria-label="menu">
+                <ExitToAppIcon />
+            </IconButton>
+    
         return( 
         <>
             <HamburgerMenu open={this.state.openMenu}
                 onClose={this.onClose.bind(this)}
             />
-            <PokedexAppBar title="Pokedex" canLogout={true} 
+            <PokedexAppBar title="Pokedex"
                 openHamburgerMenu={this.openHamburgerMenu.bind(this)}
                 enableHamburgerMenu={true}
+                endSection={endSection}
             />
-            <h1>Caught:{this.props.storeState.pokedex.pokemon.caught}/151</h1>
             <Grid
                 container
                 direction="row"
-                alignItems="center"
-                spacing={2}>
+                spacing={3}>
                 {this.createPokemonButtons()}
             </Grid>
         </>)

@@ -133,12 +133,3 @@ class AuthenticationContainer extends React.Component<Props>
 }
 
 export default withStyles(styles)(AuthenticationContainer);
-
-<parent>
-    <son>
-        <grandchild/>
-    </son>
-    <son>
-        <grandchild />
-    </son>
-</parent>

@@ -19,11 +19,13 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         menuButton: 
         {
-            marginRight: theme.spacing(10),
+            // Looks good without the margin. If needed, use it again. Just in case
+            // marginRight: theme.spacing(10),
         },
         title: 
         {
             flexGrow: 1,
+            textAlign: "center"
         },
         offset: theme.mixins.toolbar,
     }),
@@ -34,44 +36,33 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface Props
 {
-    canLogout: boolean
+    
     title: string
     openHamburgerMenu?:()=>void
-    onLogOutClick?:()=>void
     enableHamburgerMenu?:boolean
+    endSection?: JSX.Element
     
 }
-//On purpose doing this as a function component
+//On purpose doing this as a function component; to reinfornce my knowledge.
 export default function PokedexAppBar(props:Props)
 {
     //defaults
     const styles = useStyles();
     props.enableHamburgerMenu=(props.enableHamburgerMenu)?true:false
-
-    
-    let logOutButton = <></>;
+    props.endSection = props.endSection?props.endSection:<></>
     //Create Hamburger Menu
-    let hamburgerMenu = <IconButton className={styles.menuButton}  onClick={props.openHamburgerMenu} edge="start" color="inherit" aria-label="menu">
+    let hamburgerMenuIcon = <IconButton className={styles.menuButton}  onClick={props.openHamburgerMenu} edge="start" color="inherit" aria-label="menu">
         <MenuIcon />
     </IconButton>
-    //
-    if (props.canLogout)
-    {
-        logOutButton = 
-            <IconButton onClick={props.onLogOutClick} edge="start" color="inherit" aria-label="menu">
-                <ExitToAppIcon />
-            </IconButton>
-            
-    }
     return(
         <div className={styles.appBar}>
-            <AppBar position="fixed">
+            <AppBar position="fixed" className={styles.appBar}>
                 <Toolbar>
-                    {props.enableHamburgerMenu && hamburgerMenu}
+                    {props.enableHamburgerMenu && hamburgerMenuIcon}
                     <Typography className={styles.title} variant="h5">
                         {props.title}
                     </Typography>
-                    {logOutButton}
+                    {props.endSection}
                 </Toolbar>
             </AppBar>
             {/* The following 👇 adds an empty space for the fixed appbar */}

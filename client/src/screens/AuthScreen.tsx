@@ -185,8 +185,7 @@ class AuthenticationScreen extends React.Component<Props>
         
         return(
         <>
-            <PokedexAppBar title={title} canLogout={canLogout} 
-                onLogOutClick={this.signOut.bind(this)}
+            <PokedexAppBar title={title}
                 // enableHamburgerMenu={true}
                 
             />
