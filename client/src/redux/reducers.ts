@@ -61,7 +61,12 @@ const pokedex = (state:PokedexModel={},action)=>
         
         return { ...state,...action.pokedex }
       }
-
+    case Actions.UpdatePokemonCompletionWithObservable:
+      {
+        const pokedex = {...state};
+        pokedex.pokemon = action.pokemon;
+        return pokedex;
+      }
 
 
     default: return state

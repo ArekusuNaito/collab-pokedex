@@ -1,5 +1,6 @@
 const actions =
 {
+    UpdatePokemonCompletionWithObservable: "Observable",
     UpdateCaughtPokemon: "UpdateCaughtPokemon",
     SetPokedexData: "OverridePokemonState",
     LoginUser: "LoginUser",
@@ -8,7 +9,7 @@ const actions =
     SetAuth: "SetAuth",
     RemoveAuth: "RemoveAuth",
     SetDatabase: "SetDatabase",
-    RemoveDatabase: "RemoveDatabase"
+    RemoveDatabase: "RemoveDatabase",
 
 }
 

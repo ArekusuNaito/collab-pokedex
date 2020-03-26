@@ -13,6 +13,14 @@ export function UpdateCaughtPokemon(pokemonData:PokemonData)
     }
 }
 
+export function UpdatePokemonCompletion(pokemon:any)
+{
+    return{
+        pokemon,
+        type: ActionTypes.UpdatePokemonCompletionWithObservable
+    }
+}
+
 export async function SetPokedexData(pokedexID:string,user:firebase.User,database:PokedexDatabase)
 {
     const pokedexData = await database.getPokedex(pokedexID,user);

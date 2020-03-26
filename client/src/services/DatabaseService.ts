@@ -221,6 +221,11 @@ export class PokedexDatabase
         })
     }
 
+    pokemonDataObservable(pokedexID:string, callback:(snapshot:firebase.database.DataSnapshot)=>void):void
+    {
+        this.pokedexesRef.child(`${pokedexID}/pokemon`).on('value',callback);
+    }
+
     private async addPokedexToUserObject(pokedexKey:string,pokedexName:string,user:firebase.User):Promise<boolean>
     {
         return new Promise<boolean>(async resolve=>

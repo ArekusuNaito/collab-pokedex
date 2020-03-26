@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import Grid from '@material-ui/core/Grid';
 import PokemonCard from '../components/PokemonCard';
-import { UpdateCaughtPokemon,SetPokedexData } from '../redux/actions'
+import { UpdateCaughtPokemon,SetPokedexData, UpdatePokemonCompletion } from '../redux/actions'
 import { LogoutUser } from '../redux/actions'
 //models
 import PokemonData from '../models/PokemonData'
@@ -81,7 +81,20 @@ class PokedexScreenMVP extends React.Component<Props,State>
         
         
         await this.getKantoPokemonData();
-        
+        //The callback function is called whenever the value on the pokedex completion changes!
+        this.props.database.pokemonDataObservable(this.props.storeState.pokedex.id,snapshot=>
+        {
+            try
+            {
+                // console.log('Algo ha cambiado',snapshot.val());
+                this.props.dispatch(UpdatePokemonCompletion(snapshot.val()))
+                
+            }catch(error)
+            {
+                console.error(`Can't update database`,error);
+                
+            }
+        })
         
     }
 
