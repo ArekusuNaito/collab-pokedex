@@ -103,7 +103,7 @@ class PokemonCard extends React.Component<PokemonButtonProps,PokemonButtonState>
                 // Place holder image 👇
                 image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
                 // image="/assets/images/ball.png"
-                title="A Pokemon"
+                title={`Pokemon # ${this.props.dexNumber}`}
             />
         );
     }
@@ -113,7 +113,7 @@ class PokemonCard extends React.Component<PokemonButtonProps,PokemonButtonState>
         const caughtIcon = (this.props.caught)?<CheckIcon/>:<></>;
         return(
             <CardHeader
-             title = "Charmander"
+             title = {`# ${this.props.dexNumber}`}
              action={caughtIcon}
 
             /> 

@@ -50,6 +50,8 @@ store.dispatch(SetPokedexDatabaseObject(pokedexDatabase));
 
 //Create and test private routing and auto-redirect
 
+const landingPagePath = "/"
+
 const PrivatePokedexRoute = ({...rest }) =>
 {
     return <Route {...rest} render={(props) => 
@@ -63,11 +65,10 @@ const PrivatePokedexRoute = ({...rest }) =>
         }
         else 
         {
-            return <Redirect to='/sign' />
+            return <Redirect to={landingPagePath} />
         }
     }}/>
 } 
-    
     
 
 
@@ -75,7 +76,7 @@ render(
     <Provider store={store}>
         <BrowserRouter>
             <Switch>
-                <Route path="/sign" render={(props) => <AuthenticationScreen {...props} />}/>
+                <Route exact path={landingPagePath} render={(props) => <AuthenticationScreen {...props} />}/>
                 <PrivatePokedexRoute path='/home' />
                 {/* <Route exact path='/home' render={(props) => <PokedexScreenMVP {...props} pokemonPerRow={3} />} />  */}
                 <Route path='*' component={Error404}/>

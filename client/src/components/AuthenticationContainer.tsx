@@ -76,7 +76,7 @@ class AuthenticationContainer extends React.Component<Props>
                     id="emailInput"
                     inputMode="email"
                     inputRef={this.email}
-                    defaultValue="naito@kernel.com"
+                    defaultValue="test@user.com"
                     startAdornment={
                         <InputAdornment position="start">
                             <EmailIcon />
@@ -94,7 +94,7 @@ class AuthenticationContainer extends React.Component<Props>
             <Input
                 id="passwordInput"
                 type='password'
-                defaultValue='momonga'
+                defaultValue='test@user.com'
                 inputRef={this.password}
                        startAdornment={
                            <InputAdornment position="start">

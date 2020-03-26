@@ -43,6 +43,7 @@ class AuthenticationScreen extends React.Component<Props>
     password: any
     pokedexName:any
     pokedexDictionary:Object
+    pokedexesPath:string
     constructor(props) 
     {
         super(props)
@@ -54,6 +55,7 @@ class AuthenticationScreen extends React.Component<Props>
         this.goToPokedexes = this.goToPokedexes.bind(this);
         //Section references
         this.pokedexName = React.createRef()
+        this.pokedexesPath="/home";
         console.warn(props);
         
     }
@@ -121,7 +123,7 @@ class AuthenticationScreen extends React.Component<Props>
     async joinPokedex(pokedexID:string)
     {
         await this.props.joinPokedex(pokedexID,this.props.user);
-        if (this.props.pokedexID) this.props.history.push('/home');
+        if (this.props.pokedexID) this.props.history.push(this.pokedexesPath);
         
     }
 
@@ -130,14 +132,14 @@ class AuthenticationScreen extends React.Component<Props>
         console.log('Auth.CreatePokedex');
         
         await this.props.createPokedex(pokedexID);
-        if (this.props.pokedexID) this.props.history.push('/home');
+        if (this.props.pokedexID) this.props.history.push(this.pokedexesPath);
     }
 
     async goToPokedexes(pokedex:{id:string,name:string})
     {
 
         await this.props.setPokedexData(pokedex.id);
-        this.props.history.push('/home');
+        this.props.history.push(this.pokedexesPath);
     }
 
     openHamburgerMenu()
